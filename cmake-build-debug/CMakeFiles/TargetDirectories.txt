@@ -1,0 +1,3 @@
+C:/Job/Projects/Calculator/cmake-build-debug/CMakeFiles/Calculator.dir
+C:/Job/Projects/Calculator/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Job/Projects/Calculator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
