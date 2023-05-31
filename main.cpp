@@ -5,7 +5,7 @@
 
 class Calculator
 {
-    std::vector<char> operators = {'^', '*', '/', '+', '-'};
+    std::vector<char> operators = {'*', '/', '+', '-'};
 
     bool is_operator(char c)
     {
@@ -13,11 +13,14 @@ class Calculator
     }
 
 public:
-    std::string calculate(const std::string& operation)
+    std::string calculate(std::string& operation)
     {
-        size_t n = operation.size();
+        if (operation[0] == '-')
+        {
+            operation.insert(0, "0");
+        }
 
-        for (int i = 0; i < n; ++i)
+        for (int i = 0; i < operation.size(); ++i)
         {
             char c = operation[i];
 
@@ -28,7 +31,7 @@ public:
 
             if (is_operator(c))
             {
-                if (i == 0 || i == n - 1 || !isdigit(operation[i+1]) || !isdigit(operation[i-1]))
+                if (i == 0 || i == operation.size() - 1 || !isdigit(operation[i+1]) || !isdigit(operation[i-1]))
                 {
                     return "Error. Bad operators placement.";
                 }
