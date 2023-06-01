@@ -12,6 +12,52 @@ class Calculator
         return (std::find(operators.begin(), operators.end(), c) != operators.end());
     }
 
+    std::string multiply_divide(std::string& operation)
+    {
+        int start = 0;
+        for (int i = 0; i < operation.size(); ++i)
+        {
+            char c = operation[i];
+            if (operation[i] == '*' || operation[i] == '/')
+            {
+                int first_number = std::stoi(operation.substr(start, i - start));
+                int stop = int(operation.size());
+
+                for (int j = i + 1; j < operation.size(); ++j)
+                {
+                    if (is_operator(operation[j]))
+                    {
+                        stop = j;
+                        break;
+                    }
+                }
+
+                int second_number = std::stoi(operation.substr(i+1, stop - i));
+
+                operation.erase(start, stop - i + 1);
+
+                std::string result;
+                if (c == '*')
+                {
+                    result = std::to_string(first_number * second_number);
+                }
+                else
+                {
+                    result = std::to_string(first_number / second_number);
+                }
+
+                operation.insert(start, result);
+                i = start;
+            }
+            else if (c == '+' || c == '-')
+            {
+                start = i;
+            }
+        }
+
+        return operation;
+    }
+
 public:
     std::string calculate(std::string& operation)
     {
@@ -31,12 +77,14 @@ public:
 
             if (is_operator(c))
             {
-                if (i == 0 || i == operation.size() - 1 || !isdigit(operation[i+1]) || !isdigit(operation[i-1]))
+                if (i == 0 || i == operation.size() - 1 || !isdigit(operation[i+1]))
                 {
                     return "Error. Bad operators placement.";
                 }
             }
         }
+
+        operation = multiply_divide(operation);
 
         return operation;
     }
