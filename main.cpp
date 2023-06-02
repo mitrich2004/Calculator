@@ -12,13 +12,13 @@ class Calculator
         return (std::find(operators.begin(), operators.end(), c) != operators.end());
     }
 
-    std::string multiply_divide(std::string& operation)
+    std::string calculate(std::string& operation, int order)
     {
         int start = 0;
         for (int i = 0; i < operation.size(); ++i)
         {
             char c = operation[i];
-            if (operation[i] == '*' || operation[i] == '/')
+            if ((order == 1 && (operation[i] == '*' || operation[i] == '/')) || (order == 2 && (operation[i] == '+' || operation[i] == '-')))
             {
                 int first_number = std::stoi(operation.substr(start, i - start));
                 int stop = int(operation.size());
@@ -33,25 +33,24 @@ class Calculator
                 }
 
                 int second_number = std::stoi(operation.substr(i+1, stop - i));
-
                 operation.erase(start, stop - i + 1);
 
-                std::string result;
-                if (c == '*')
+                int result;
+                switch (c)
                 {
-                    result = std::to_string(first_number * second_number);
-                }
-                else
-                {
-                    result = std::to_string(first_number / second_number);
+                    case '*': result = first_number * second_number; break;
+                    case '/': result = first_number / second_number; break;
+                    case '+': result = first_number + second_number; break;
+                    case '-': result = first_number - second_number; break;
+                    default: result = 0;
                 }
 
-                operation.insert(start, result);
+                operation.insert(start, std::to_string(result));
                 i = start;
             }
-            else if (c == '+' || c == '-')
+            else if (is_operator(c))
             {
-                start = i;
+                start = i + 1;
             }
         }
 
@@ -84,7 +83,8 @@ public:
             }
         }
 
-        operation = multiply_divide(operation);
+        operation = calculate(operation, 1);
+        operation = calculate(operation, 2);
 
         return operation;
     }
