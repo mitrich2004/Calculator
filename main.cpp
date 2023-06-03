@@ -12,6 +12,71 @@ class Calculator
         return (std::find(operators.begin(), operators.end(), c) != operators.end());
     }
 
+    int check_operation(const std::string& operation)
+    {
+        bool was_dot = false;
+
+        for (int i = 0; i < operation.size(); ++i)
+        {
+            char c = operation[i];
+
+            if (!isdigit(c) && !is_operator(c) && c != '.')
+            {
+                return 1;
+                //"Error. Bad character found."
+            }
+
+            if (is_operator(c))
+            {
+                if (i == 0 || i == operation.size() - 1 || !isdigit(operation[i+1]))
+                {
+                    return 2;
+                    //"Error. Bad operator placement."
+                }
+                else
+                {
+                    was_dot = false;
+                }
+            }
+
+            if (c == '.')
+            {
+                if (i == 0 || i == operation.size() - 1 || !isdigit(operation[i+1]) || !isdigit(operation[i-1]) || was_dot)
+                {
+                    return 3;
+                    //"Error. Bad decimal dot placement."
+                }
+                else
+                {
+                    was_dot = true;
+                }
+            }
+        }
+
+        return 0;
+        //all okay
+    }
+
+    static std::string round(std::string& number)
+    {
+        size_t dot_pos = number.find('.');
+
+        for (int i = 7; i > 0; --i)
+        {
+            if (number[dot_pos + i] == '0')
+            {
+                number = number.erase(dot_pos + i);
+            }
+        }
+
+        if (dot_pos == number.size() - 1)
+        {
+            number = number.erase(dot_pos);
+        }
+
+        return number;
+    }
+
     std::string calculate(std::string& operation, int order)
     {
         int start = 0;
@@ -20,7 +85,7 @@ class Calculator
             char c = operation[i];
             if ((order == 1 && (operation[i] == '*' || operation[i] == '/')) || (order == 2 && (operation[i] == '+' || operation[i] == '-')))
             {
-                int first_number = std::stoi(operation.substr(start, i - start));
+                double first_number = std::stod(operation.substr(start, i - start));
                 int stop = int(operation.size());
 
                 for (int j = i + 1; j < operation.size(); ++j)
@@ -32,10 +97,10 @@ class Calculator
                     }
                 }
 
-                int second_number = std::stoi(operation.substr(i+1, stop - i));
-                operation.erase(start, stop - i + 1);
+                double second_number = std::stod(operation.substr(i+1, stop - i));
+                operation.erase(start, stop - start);
 
-                int result;
+                double result;
                 switch (c)
                 {
                     case '*': result = first_number * second_number; break;
@@ -65,28 +130,20 @@ public:
             operation.insert(0, "0");
         }
 
-        for (int i = 0; i < operation.size(); ++i)
+        int operation_status = check_operation(operation);
+
+        switch (operation_status)
         {
-            char c = operation[i];
-
-            if (!isdigit(c) && !is_operator(c))
-            {
-                return "Error. Bad character found.";
-            }
-
-            if (is_operator(c))
-            {
-                if (i == 0 || i == operation.size() - 1 || !isdigit(operation[i+1]))
-                {
-                    return "Error. Bad operators placement.";
-                }
-            }
+            case 1: return "Error. Bad character found."; break;
+            case 2: return "Error. Bad operator placement."; break;
+            case 3: return "Error. Bad decimal dot placement."; break;
+            default: break;
         }
 
         operation = calculate(operation, 1);
         operation = calculate(operation, 2);
 
-        return operation;
+        return round(operation);
     }
 };
 
